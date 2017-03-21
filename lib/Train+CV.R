@@ -1,31 +1,27 @@
-#GBM
+library("caret")
+library("gbm")
+library("randomForest")
+library("plyr")
+library("xgboost")
+library("fastAdaboost")
 
-#Install packages
-#install.packages("caret")
-#install.packages("gbm")
-#install.packages("randomForest")
-#install.packages("plyr")
-#install.packages("xgboost")
-#install.packages("fastAdaboost")
-
-library(caret)
-library(gbm)
-library(randomForest)
-library(plyr)
-library(xgboost)
-library(fastAdaboost)
-
-
-
-X <- read.csv("/Users/xuehan/Desktop/spr2017-proj3-group7/data/sift_features.csv")
+X <- read.csv(choose.files())
 X <- t(X)
-labels <- read.csv("/Users/xuehan/Desktop/spr2017-proj3-group7/data/labels.csv")
-r <- sample(1:2000, 2000)
-r <- r[1:100]
-dat_train<-X[r,]
-label_train <- labels[r,1]
+labels <- read.csv(choose.files())
+labels <- labels[,1]
+dat_train<-X
+label_train <- labels
+
 
 Train <- function(dat_train, label_train){
+  
+  n <- nrow(dat_train)
+  
+  r <- sample(1:n, n)
+  
+  dat_train <- dat_train[r,]
+  
+  label_train <- label_train[r]
   
   data.all <- as.data.frame(cbind(dat_train, label_train))
   
@@ -50,6 +46,7 @@ Train <- function(dat_train, label_train){
                   bag.fraction = 0.5, tuneGrid = gbmGrid
                   ) #parameter tuning
   
+  err.gbm <- sum(predict(gbmfit, testing) != testing$Label)/nrow(testing)
   
   # Random Forest
   rfGrid <- expand.grid(mtry = 2^(5:10) )
@@ -58,16 +55,21 @@ Train <- function(dat_train, label_train){
                  method = "rf", trControl = control, tuneGrid = rfGrid
                   ) #parameter tuning
   
+  err.rf <- sum(predict(rffit, testing) != testing$Label)/nrow(testing)
+
   # SVM
   svmGrid <- expand.grid(sigma= 2^c(-25, -20, -15,-10, -5, 0), C= 2^c(0:5))
   svmfit <- train(Label~., data = training,
                  method = "svmRadial", trControl = control, tuneGrid = svmGrid, preProc = c("center","scale")
                   ) #parameter tuning
   
+  err.svm <- sum(predict(svmfit, testing) != testing$Label)/nrow(testing)
+  
   # xgBoost
   xgbfit <- train(Label~., data = training,
                  method = "xgbLinear", trControl = control
                  ) #parameter tuning
   
+  err.xgb <- sum(predict(xgbfit, testing) != testing$Label)/nrow(testing)
+  
 }
-
