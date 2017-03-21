@@ -1,5 +1,13 @@
 #GBM
 
+#Install packages
+#install.packages("caret")
+#install.packages("gbm")
+#install.packages("randomForest")
+#install.packages("plyr")
+#install.packages("xgboost")
+#install.packages("fastAdaboost")
+
 library("caret")
 library("gbm")
 library("randomForest")
@@ -7,9 +15,11 @@ library("plyr")
 library("xgboost")
 library("fastAdaboost")
 
-X <- read.csv(choose.files())
+
+
+X <- read.csv("/Users/xuehan/Desktop/spr2017-proj3-group7/data/sift_features.csv")
 X <- t(X)
-labels <- read.csv(choose.files())
+labels <- read.csv("/Users/xuehan/Desktop/spr2017-proj3-group7/data/label.csv")
 r <- sample(1:2000, 2000)
 r <- r[1:100]
 dat_train<-X[r,]
@@ -60,3 +70,4 @@ Train <- function(dat_train, label_train){
                  ) #parameter tuning
   
 }
+
