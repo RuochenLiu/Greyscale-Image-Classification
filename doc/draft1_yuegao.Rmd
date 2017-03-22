@@ -16,12 +16,6 @@ library("xgboost")
 library("fastAdaboost")
 library("e1071")
 
-library(data.table)
-library(caretEnsemble)
-library(caret)
-library(rpart)
- library(pROC)
-
 setwd("~/GitHub/spr2017-proj3-group7")
 
 sift_f <- read.csv("./data/sift_features.csv")
@@ -79,7 +73,7 @@ GBMTrain <- function(dat_train, label_train){
 
   n <- nrow(dat_train)
   
-  r <- sample(1:n, n)
+  r <- sample(1:n, 0.1*n)
   
   dat_train <- dat_train[r,]
   
@@ -111,8 +105,9 @@ GBMTrain <- function(dat_train, label_train){
   err.gbm <- sum(predict(gbmfit, testing) != testing$Label)/nrow(testing)
   
   print(paste("gbm error is",err.gbm))
+  predict_results[1]=err.gbm
 
-
+}
 ```
 
 
@@ -121,7 +116,7 @@ RFTrain <- function(dat_train, label_train){
   
   n <- nrow(dat_train)
   
-  r <- sample(1:n, 0.1*n)
+  r <- sample(1:n, n)
   
   dat_train <- dat_train[r,]
   
@@ -233,9 +228,9 @@ XGBTrain <- function(dat_train, label_train){
 
 ```{r}
 t1<-Sys.time()
-GBMTrain(X,labels)
+GBMTrain(dat,labels)
 t2<-Sys.time()
-print(paste("GBM time is",difftime(t1,t2)))
+print(paste("GBM time is",difftime(t2,t1)))
 
 t1<-Sys.time()
 RFTrain(X,labels)
