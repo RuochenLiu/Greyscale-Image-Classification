@@ -60,11 +60,11 @@ Train <- function(dat_train, label_train){
  
   # SVM Linear Kernel
   svmGrid <- expand.grid(C= 2^c(0:5))
-  svmfit <- train(Label~., data = training,
+  svmfit.linear <- train(Label~., data = training,
                   method = "svmLinear", trControl = control, tuneGrid = svmGrid, preProc = c("center","scale")
   ) #parameter tuning
   
-  err.svm <- sum(predict(svmfit, testing) != testing$Label)/nrow(testing)
+  err.svm.linear <- sum(predict(svmfit.linear, testing) != testing$Label)/nrow(testing)
   
   # SVM RBF
   svmGrid <- expand.grid(sigma= 2^c(-25, -20, -15,-10, -5, 0), C= 2^c(0:5))
@@ -82,3 +82,4 @@ Train <- function(dat_train, label_train){
   err.xgb <- sum(predict(xgbfit, testing) != testing$Label)/nrow(testing)
   
 }
+
