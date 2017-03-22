@@ -1,3 +1,5 @@
+#GBM
+
 library("caret")
 library("gbm")
 library("randomForest")
@@ -5,11 +7,14 @@ library("plyr")
 library("xgboost")
 library("fastAdaboost")
 
-X <- read.csv("/Users/xuehan/Desktop/spr2017-proj3-group7/data/sift_features.csv")
+X <- read.csv("../data/sift_features.csv")
 X <- t(X)
-labels <- read.csv("/Users/xuehan/Desktop/spr2017-proj3-group7/data/labels.csv")
+
+labels <- read.csv("../data/labels.csv")
 labels <- labels[,1]
-dat_train<-X
+#dat_train<-X
+#dat_train<-dat
+dat_train<-cbind(X,dat)
 label_train <- labels
 
 
@@ -29,7 +34,7 @@ label_train <- labels
   
   data.all$Label <- as.factor(data.all$Label)
   
-  control <- trainControl(method = "cv", number = 5)  #use 5-fold cross validation
+  control <- trainControl(method = 'cv', number = 5)  #use 5-fold cross validation
   
   inTrain <- createDataPartition(y = data.all$Label, p=0.75, list=FALSE)
   
@@ -44,7 +49,7 @@ label_train <- labels
   gbmfit <- train(Label~., data = training,
                   method = "gbm", trControl = control, verbose = FALSE,
                   bag.fraction = 0.5, tuneGrid = gbmGrid
-                  ) #parameter tuning
+  ) #parameter tuning
   
   err.gbm <- sum(predict(gbmfit, testing) != testing$Label)/nrow(testing)
   
@@ -53,15 +58,15 @@ label_train <- labels
   
   rffit <- train(Label~., data = training,
                  method = "rf", trControl = control, tuneGrid = rfGrid
-                  ) #parameter tuning
+  ) #parameter tuning
   
   err.rf <- sum(predict(rffit, testing) != testing$Label)/nrow(testing)
-
- 
+  
+  
   # SVM Linear Kernel
   svmGrid.linear <- expand.grid(C= 2^c(0:5))
   svmfit.linear <- train(Label~., data = training,
-                  method = "svmLinear", trControl = control, tuneGrid = svmGrid, preProc = c("center","scale")
+                         method = "svmLinear", trControl = control, tuneGrid = svmGrid.linear, preProc = c("center","scale")
   ) #parameter tuning
   
   err.svm.linear <- sum(predict(svmfit.linear, testing) != testing$Label)/nrow(testing)
@@ -69,17 +74,22 @@ label_train <- labels
   # SVM RBF
   svmGrid <- expand.grid(sigma= 2^c(-25, -20, -15,-10, -5, 0), C= 2^c(0:5))
   svmfit <- train(Label~., data = training,
-                 method = "svmRadial", trControl = control, tuneGrid = svmGrid, preProc = c("center","scale")
-                  ) #parameter tuning
+                  method = "svmRadial", trControl = control, tuneGrid = svmGrid, preProc = c("center","scale")
+  ) #parameter tuning
   
   err.svm <- sum(predict(svmfit, testing) != testing$Label)/nrow(testing)
   
   # xgBoost
   xgbfit <- train(Label~., data = training[1:100,],
-                 method = "xgbLinear", trControl = control
-                 ) #parameter tuning
+                  method = "xgbLinear", trControl = control
+  ) #parameter tuning
   
   err.xgb <- sum(predict(xgbfit, testing) != testing$Label)/nrow(testing)
   
 #}
 
+save(xgbfit, file="../output/xgbfit_sift5000.RData")
+save(svmfit, file="../output/svmfit_sift5000.RData")
+save(svmfit.linear, file="../output/svmfitlinear_sift5000.RData")
+save(rffit, file="../output/rffit_sift5000.RData")
+save(gbmfit, file="../output/gbmfit_sift5000.RData")
