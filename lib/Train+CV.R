@@ -13,7 +13,7 @@ dat_train<-X
 label_train <- labels
 
 
-Train <- function(dat_train, label_train){
+#Train <- function(dat_train, label_train){
   
   n <- nrow(dat_train)
   
@@ -29,7 +29,7 @@ Train <- function(dat_train, label_train){
   
   data.all$Label <- as.factor(data.all$Label)
   
-  control <- trainControl(method = 'cv', number = 5)  #use 5-fold cross validation
+  control <- trainControl(method = "cv", number = 5)  #use 5-fold cross validation
   
   inTrain <- createDataPartition(y = data.all$Label, p=0.75, list=FALSE)
   
@@ -59,7 +59,7 @@ Train <- function(dat_train, label_train){
 
  
   # SVM Linear Kernel
-  svmGrid <- expand.grid(C= 2^c(0:5))
+  svmGrid.linear <- expand.grid(C= 2^c(0:5))
   svmfit.linear <- train(Label~., data = training,
                   method = "svmLinear", trControl = control, tuneGrid = svmGrid, preProc = c("center","scale")
   ) #parameter tuning
@@ -81,5 +81,5 @@ Train <- function(dat_train, label_train){
   
   err.xgb <- sum(predict(xgbfit, testing) != testing$Label)/nrow(testing)
   
-}
+#}
 
