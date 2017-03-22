@@ -1,0 +1,264 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library("caret")
+library("gbm")
+library("randomForest")
+library("plyr")
+library("xgboost")
+library("fastAdaboost")
+library("e1071")
+
+library(data.table)
+library(caretEnsemble)
+library(caret)
+library(rpart)
+ library(pROC)
+
+setwd("~/GitHub/spr2017-proj3-group7")
+
+sift_f <- read.csv("./data/sift_features.csv")
+X <- t(sift_f)
+labels <- read.csv("./data/labels.csv")
+labels <- labels[,1]
+dat_train<-X
+label_train <- labels
+
+```
+
+PCA
+```{r}
+
+filelabel=labels
+
+Data.pca=as.data.frame(X)
+
+feature_pca= prcomp(Data.pca,retx=TRUE)
+scores= as.data.frame(cbind(feature_pca$x, filelabel))
+scores$filelabel= as.factor(filelabel)
+sample= sample(nrow(scores),0.8*nrow(scores))
+
+data.train= scores[sample,c(1:1000,2001)]
+data.test=scores[-sample,c(1:1000,2001)]
+
+predict_results = vector()
+
+gbm.fit <- gbm(filelabel~., data = data.train, distribution = "gaussian", n.tree= 1000, shrinkage = 0.001)
+gbm.predict <- predict(gbm.fit, newdata=data.test, n.trees= 100)
+gbm.predict=as.numeric(gbm.predict > mean(gbm.predict)) 
+
+predict_results[1]= mean(data.test$filelabel==gbm.predict)
+##########################################
+# Random Forest
+#########################################
+library(randomForest)
+tree.rf.fit <- randomForest(filelabel~., data = data.train)
+out.rf <- predict(gbm.fit, newdata=data.test,n.trees= 500)
+rf.predict=as.numeric(out.rf > mean(out.rf)) 
+predict_results[2]= mean(data.test$filelabel==rf.predict)
+##########################################
+# svm
+##########################################
+svm.fit=svm(filelabel~., data = data.train,kernel="radial")
+svm.pred= predict(svm.fit,newdata = data.test)
+predict_results[3]=mean(data.test$filelabel==svm.pred)
+
+
+```
+
+
+```{r}
+GBMTrain <- function(dat_train, label_train){
+
+  n <- nrow(dat_train)
+  
+  r <- sample(1:n, n)
+  
+  dat_train <- dat_train[r,]
+  
+  label_train <- label_train[r]
+  
+  data.all <- as.data.frame(cbind(dat_train, label_train))
+  
+  colnames(data.all)[ncol(data.all)] <- "Label"
+  
+  data.all$Label <- as.factor(data.all$Label)
+  
+  control <- trainControl(method = 'cv', number = 5)  #use 5-fold cross validation
+  
+  inTrain <- createDataPartition(y = data.all$Label, p=0.75, list=FALSE)
+  
+  training <- data.all[inTrain, ]
+  
+  testing <- data.all[-inTrain, ]
+  
+  # GBM
+  gbmGrid <- expand.grid(interaction.depth = (1:5) * 2,n.trees = (1:10)*25,shrinkage = .1,
+                         n.minobsinnode = 10)
+  
+  gbmfit <- train(Label~., data = training,
+                  method = "gbm", trControl = control, verbose = FALSE,
+                  bag.fraction = 0.5, tuneGrid = gbmGrid
+                  ) #parameter tuning
+  
+  err.gbm <- sum(predict(gbmfit, testing) != testing$Label)/nrow(testing)
+  
+  print(paste("gbm error is",err.gbm))
+
+
+```
+
+
+```{r}
+RFTrain <- function(dat_train, label_train){
+  
+  n <- nrow(dat_train)
+  
+  r <- sample(1:n, 0.1*n)
+  
+  dat_train <- dat_train[r,]
+  
+  label_train <- label_train[r]
+  
+  data.all <- as.data.frame(cbind(dat_train, label_train))
+  
+  colnames(data.all)[ncol(data.all)] <- "Label"
+  
+  data.all$Label <- as.factor(data.all$Label)
+  
+  control <- trainControl(method = 'cv', number = 5)  #use 5-fold cross validation
+  
+  inTrain <- createDataPartition(y = data.all$Label, p=0.75, list=FALSE)
+  
+  training <- data.all[inTrain, ]
+  
+  testing <- data.all[-inTrain, ]
+  
+  # Random Forest
+  rfGrid <- expand.grid(mtry = 2^(5:10) )
+  
+  rffit <- train(Label~., data = training,
+                 method = "rf", trControl = control, tuneGrid = rfGrid
+                  ) #parameter tuning
+  
+  err.rf <- sum(predict(rffit, testing) != testing$Label)/nrow(testing)
+  
+    print("rf error is",err.rf)
+}
+
+```
+
+
+```{r}
+SVMTrain <- function(dat_train, label_train){
+  
+  n <- nrow(dat_train)
+  
+  r <- sample(1:n, 0.1*n)
+  
+  dat_train <- dat_train[r,]
+  
+  label_train <- label_train[r]
+  
+  data.all <- as.data.frame(cbind(dat_train, label_train))
+  
+  colnames(data.all)[ncol(data.all)] <- "Label"
+  
+  data.all$Label <- as.factor(data.all$Label)
+  
+  control <- trainControl(method = 'cv', number = 5)  #use 5-fold cross validation
+  
+  inTrain <- createDataPartition(y = data.all$Label, p=0.75, list=FALSE)
+  
+  training <- data.all[inTrain, ]
+  
+  testing <- data.all[-inTrain, ]
+  
+  # SVM
+  svmGrid <- expand.grid(sigma= 2^c(-25, -20, -15,-10, -5, 0), C= 2^c(0:5))
+  svmfit <- train(Label~., data = training,
+                 method = "svmRadial", trControl = control, tuneGrid = svmGrid, preProc = c("center","scale")
+                  ) #parameter tuning
+  
+  err.svm <- sum(predict(svmfit, testing) != testing$Label)/nrow(testing)
+  
+    print("svm error is",err.svm)
+}
+```
+
+
+```{r}
+XGBTrain <- function(dat_train, label_train){
+  
+  n <- nrow(dat_train)
+  
+  r <- sample(1:n, 0.1*n)
+  
+  dat_train <- dat_train[r,]
+  
+  label_train <- label_train[r]
+  
+  data.all <- as.data.frame(cbind(dat_train, label_train))
+  
+  colnames(data.all)[ncol(data.all)] <- "Label"
+  
+  data.all$Label <- as.factor(data.all$Label)
+  
+  control <- trainControl(method = 'cv', number = 5)  #use 5-fold cross validation
+  
+  inTrain <- createDataPartition(y = data.all$Label, p=0.75, list=FALSE)
+  
+  training <- data.all[inTrain, ]
+  
+  testing <- data.all[-inTrain, ]
+  
+  # xgBoost
+  xgbfit <- train(Label~., data = training,
+                 method = "xgbLinear", trControl = control
+                 ) #parameter tuning
+  
+  err.xgb <- sum(predict(xgbfit, testing) != testing$Label)/nrow(testing)
+  
+    print("xgb error is",err.xgb)
+}
+
+```
+
+```{r}
+t1<-Sys.time()
+GBMTrain(X,labels)
+t2<-Sys.time()
+print(paste("GBM time is",difftime(t1,t2)))
+
+t1<-Sys.time()
+RFTrain(X,labels)
+t2<-Sys.time()
+print("RF time is",difftime(t1,t2))
+
+t1<-Sys.time()
+SVMTrain(X,labels)
+t2<-Sys.time()
+print("SVM time is",difftime(t1,t2))
+
+t1<-Sys.time()
+XGBTrain(X,labels)
+t2<-Sys.time()
+print("XGB time is",difftime(t1,t2))
+
+```
+
+
+```{r}
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file).
