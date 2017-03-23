@@ -1,3 +1,0 @@
-/Users/ciellagrange/GitHub/spr2017-proj3-group7/data/openCV/CMakeFiles/rebuild_cache.dir
-/Users/ciellagrange/GitHub/spr2017-proj3-group7/data/openCV/CMakeFiles/edit_cache.dir
-/Users/ciellagrange/GitHub/spr2017-proj3-group7/data/openCV/CMakeFiles/sift.dir
