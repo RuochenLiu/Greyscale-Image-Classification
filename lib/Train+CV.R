@@ -52,24 +52,13 @@ label_train <- labels
   
   testing <- data.all[-inTrain, ]
   
-<<<<<<< HEAD
+
   ##### GBM ######
-=======
-  ### GBM
->>>>>>> origin/master
-  gbmGrid <- expand.grid(interaction.depth = (1:5) * 2,n.trees = (1:10)*25,shrinkage = .1,
-                         n.minobsinnode = 10)
-  
-  gbmfit <- train(Label~., data = training,
-                  method = "gbm", trControl = control, verbose = FALSE,
-                  bag.fraction = 0.5, tuneGrid = gbmGrid
-  )
-  
-  gbm.tuned<-gbm(Label~., data=training, interaction.depth = gbmfit$bestTune$interaction.depth,
+ gbm.tuned<-gbm(Label~., data=training, interaction.depth = gbmfit$bestTune$interaction.depth,
                 n.trees = gbmfit$bestTune$n.trees, shrinkage = gbmfit$bestTune$shrinkage,
                 n.minobsinnode = gbmfit$bestTune$n.minobsinnode,distribution = "bernoulli" )
   
-<<<<<<< HEAD
+  
   gbm.test<-gbm(Label~., data=testing, interaction.depth = gbmfit$bestTune$interaction.depth,
                n.trees = gbmfit$bestTune$n.trees,shrinkage = gbmfit$bestTune$shrinkage,
                n.minobsinnode = gbmfit$bestTune$n.minobsinnode, distribution = "bernoulli")
@@ -96,25 +85,12 @@ label_train <- labels
   #Train error
   train.err.rf <- sum(predict(rf.tuned, training) != training$Label)/nrow(training)
   train.err.rf
-=======
-  ### Random Forest
-  rfGrid <- expand.grid(mtry = 2^(5:10) )
+
+ 
   
-  rffit <- train(Label~., data = training,
-                 method = "rf", trControl = control, tuneGrid = rfGrid
-  ) 
->>>>>>> origin/master
-  
-  #Test error
-  test.err.rf <- sum(predict(rf.test, testing) != testing$Label)/nrow(testing)
-  test.err.rf
-  
-  
-<<<<<<< HEAD
+
   ###### SVM Linear Kernel ######
-=======
-  ### SVM Linear
->>>>>>> origin/master
+
   svmGrid.linear <- expand.grid(C= 2^c(0:5))
   svmfit.linear <- train(Label~., data = training,
                          method = "svmLinear", trControl = control, tuneGrid = svmGrid.linear, preProc = c("center","scale")
@@ -123,7 +99,6 @@ label_train <- labels
   svm.linear.tuned<-svm(Label~., data=training, kernel="linear",cost=svmfit.linear$bestTune$C)
   svm.linear.test<-svm(Label~., data=testing, kernel="linear",cost=svmfit.linear$bestTune$C)
   
-<<<<<<< HEAD
   #Train error
   train.err.svm.l <- sum(predict(svm.linear.tuned, training) != training$Label)/nrow(training)
   train.err.svm.l
@@ -135,9 +110,7 @@ label_train <- labels
   
   
   ###### SVM RBF Kernel ######
-=======
-  ### SVM RBF
->>>>>>> origin/master
+
   svmGrid <- expand.grid(sigma= 2^c(-25, -20, -15,-10, -5, 0), C= 2^c(0:5))
   svmfit <- train(Label~., data = training,
                   method = "svmRadial", trControl = control, tuneGrid = svmGrid, preProc = c("center","scale")
