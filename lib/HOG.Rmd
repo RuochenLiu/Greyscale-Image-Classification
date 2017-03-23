@@ -1,61 +1,6 @@
----
-title: "Untitled"
-author: "Ruochen Liu rl2841"
-date: "March 20, 2017"
-output: html_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-```{r}
-setwd("/Users/xuehan/Desktop/spr2017-proj3-group7/")
-img_dir <- "../data/raw_images/"
-dir_names <- list.files(img_dir)
+#knitr::opts_chunk$set(echo = TRUE)
 
 
-library("EBImage")
-library("OpenImageR")  
-n_files <- length(list.files(img_dir))
-
-### determine img dimensions
-img0 <- readImage(paste0(img_dir,  dir_names[1]))
-display(img0)
-img1 <- readImage(paste0(img_dir,  dir_names[2]))
-img2 <-  readImage(paste0(img_dir,  dir_names[3]))
-h1 <- HOG(img2)
-
-
-### store vectorized pixel values of images
-dat <- matrix(NA, n_files,54) 
-for(i in 1:n_files){
-  img <- readImage(paste0(img_dir, dir_names[i]))
-  h <- HOG(img)
-  dat[i,] <- h
-}
-dat
-### output constructed features
-#if(export){
-#  save(dat, file=paste0("../output/HOG.RData"))
-#}
-#return(dat)
-
-  
-```
-
----
-title: "Untitled"
-author: "Ruochen Liu rl2841"
-date: "March 20, 2017"
-output: html_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-```{r}
 library("EBImage")
 library("OpenImageR")
 
@@ -81,6 +26,3 @@ if(export){
   save(H, file=paste0("../output/HOG.RData"))
 }
 return(H)
-
-
-```

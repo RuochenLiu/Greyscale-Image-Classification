@@ -105,11 +105,11 @@ label_train <- labels
   rf.test<-randomForest(Label~., data=testing,mtry=rffit$bestTune$mtry)
   
   #Train error
-  train.err.rf <- sum(predict(rf.tuned, training) != training$Label)/nrow(training)
+  train.err.rf <- sum(rf.tuned$predicted != training$Label)/nrow(training)
   train.err.rf
 
   #Test error
-  test.err.rf <- sum(predict(rf.tuned, testing) != testing$Label)/nrow(testing)
+  test.err.rf <- sum(rf.test$predicted != testing$Label)/nrow(testing)
   test.err.rf
   
 
