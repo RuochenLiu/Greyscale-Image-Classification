@@ -54,12 +54,20 @@ label_train <- labels
                   bag.fraction = 0.5, tuneGrid = gbmGrid
   ) #parameter tuning
   
+  gbm.tuned<-gbm(Label~., data=training, interaction.depth = gbmfit$bestTune$interaction.depth,
+                n.trees = gbmfit$bestTune$n.trees, shrinkage = gbmfit$bestTune$shrinkage,
+                n.minobsinnode = gbmfit$bestTune$n.minobsinnode,distribution = "bernoulli" )
+  
+  gbm.test<-gbm(Label~., data=testing, interaction.depth = gbmfit$bestTune$interaction.depth,
+               n.trees = gbmfit$bestTune$n.trees,shrinkage = gbmfit$bestTune$shrinkage,
+               n.minobsinnode = gbmfit$bestTune$n.minobsinnode, distribution = "bernoulli")
+  
   #Train error
-  train.err.gbm <- sum(predict(rf.tuned, training) != training$Label)/nrow(training)
+  train.err.gbm <- sum(predict(gbm.tuned, training) != training$Label)/nrow(training)
   train.err.gbm
   
   #Test error
-  test.err.gbm <- sum(predict(rf.test, testing) != testing$Label)/nrow(testing)
+  test.err.gbm <- sum(predict(gbm.test, testing) != testing$Label)/nrow(testing)
   test.err.gbm
   
   
