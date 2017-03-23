@@ -14,7 +14,7 @@ labels <- read.csv("../data/labels.csv")
 labels <- labels[,1]
 #dat_train<-X
 #dat_train<-dat
-dat_train<-cbind(X,dat)
+dat_train<-cbind(X,H)
 label_train <- labels
 
 
