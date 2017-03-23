@@ -1,28 +1,43 @@
+###########################################################################
+####### This file (Train.R) is consistent of six training models.   #######
+####### They are GBM, SVM with Linear Kernel, SVM with RBF Kernel,  #######
+####### Random Forest, xgboost, and DeepBoost.                      #######
+
+###########################################################################
+
+###### Given the feature extracted from HOG in the "feature.R" file, ######
+###### the BEST classifier is the DeepBoost.                         ######
+###### The training error is about 0.044,                            ######
+###### and the test error is about 0.005.                            ######
+
+###########################################################################
+
+###### Overall, our best model is feature HOG + DeepBoost.           ######
+
+###########################################################################
+
+#load requied packages
+
 library("caret")
 library("gbm")
 library("randomForest")
 library("plyr")
 library("xgboost")
 library("fastAdaboost")
-<<<<<<< HEAD
 library("e1071")
-=======
 library("deepboost")
->>>>>>> origin/master
 
+setwd("your locate path")
 X <- read.csv("../data/sift_features.csv")
 X <- t(X)
 
 labels <- read.csv("../data/labels.csv")
 labels <- labels[,1]
 #dat_train<-X
-<<<<<<< HEAD
 dat_train<-dat
 #dat_train<-cbind(X,dat)
-=======
-dat_train<-H
+#dat_train<-H
 #dat_train<-cbind(P,H)
->>>>>>> origin/master
 label_train <- labels
 
 
@@ -86,10 +101,12 @@ label_train <- labels
   train.err.rf <- sum(predict(rf.tuned, training) != training$Label)/nrow(training)
   train.err.rf
 
- 
+  #Test error
+  test.err.rf <- sum(predict(rf.tuned, testing) != testing$Label)/nrow(testing)
+  test.err.rf
   
 
-  ###### SVM Linear Kernel ######
+  ###### SVM with Linear Kernel ######
 
   svmGrid.linear <- expand.grid(C= 2^c(0:5))
   svmfit.linear <- train(Label~., data = training,
@@ -109,7 +126,7 @@ label_train <- labels
   
   
   
-  ###### SVM RBF Kernel ######
+  ###### SVM with RBF Kernel ######
 
   svmGrid <- expand.grid(sigma= 2^c(-25, -20, -15,-10, -5, 0), C= 2^c(0:5))
   svmfit <- train(Label~., data = training,
@@ -129,20 +146,67 @@ label_train <- labels
   
  
   
-  ### xgBoost
+  ###### xgBoost ######
   xgbfit <- train(Label~., data = training,
                   method = "xgbLinear", trControl = control
   )
   
-  err.xgb <- sum(predict(xgbfit, testing) != testing$Label)/nrow(testing)
+  xgb.tuned<-xgboost(data=as.matrix(training[,-ncol(training)]),
+                         label=as.matrix(training[,ncol(training)]),
+                         missing = NA, weight = NULL,
+                         nrounds=xgbfit$bestTune$nrounds,
+                         lambda=xgbfit$bestTune$lambda,
+                         alpha=xgbfit$bestTune$alpha,
+                         eta=xgbfit$bestTune$eta)
+  xgb.test<-xgboost(data=as.matrix(testing[,-ncol(testing)]),
+                    label=as.matrix(testing[,ncol(testing)]),
+                    missing = NA, weight = NULL,
+                    nrounds=xgbfit$bestTune$nrounds,
+                    lambda=xgbfit$bestTune$lambda,
+                    alpha=xgbfit$bestTune$alpha,
+                    eta=xgbfit$bestTune$eta)
   
-  ### DeepBoost
+  #Train error
+  train.err.xgboost <- sum(predict(xgb.tuned, as.matrix(training)) != training$Label)/nrow(training)
+  train.err.xgboost
+  #Test error
+  test.err.xgboost <- sum(predict(xgb.test, testing) != testing$Label)/nrow(testing)
+  test.err.xgboost
+  
+  
+  ###### DeepBoost ######
   dbfit <- train(Label~., data = training,
-                  method = "deepboost", trControl = control, verbose = FALSE
-  )
-  err.db <- sum(predict(dbfit, testing) != testing$Label)/nrow(testing)
+                  method = "deepboost", trControl = control, verbose = FALSE)
   
-#}
+  db.tuned<-deepboost(Label~., data=training, num_iter=dbfit$bestTune$num_iter, 
+                                              tree_depth=dbfit$bestTune$tree_depth,
+                                              beta=dbfit$bestTune$beta,
+                                              lambda=dbfit$bestTune$lambda,
+                                              loss_type = "l")
+  db.test<-deepboost(Label~., data=testing, num_iter=dbfit$bestTune$num_iter, 
+                                            tree_depth=dbfit$bestTune$tree_depth,
+                                            beta=dbfit$bestTune$beta,
+                                            lambda=dbfit$bestTune$lambda,
+                                            loss_type = "l")
+  
+  #Train error
+  train.err.db <- sum(predict(db.tuned, training) != training$Label)/nrow(training)
+  train.err.db
+  #Test error
+  test.err.db <- sum(predict(db.test, testing) != testing$Label)/nrow(testing)
+  test.err.db
+ 
+  
+  #Summarize training and test error for all models
+  training.error<-list(train.err.gbm,train.err.rf,train.err.svm.l, train.err.svm,
+                   train.err.xgboost,train.err.db) 
+  test.error<-list(test.err.gbm,test.err.rf,test.err.svm.l, test.err.svm,
+                       test.err.xgboost,test.err.db)
+  training.err.plot<-plot(unlist(training.error))
+  test.err.plot<-plot(unlist(test.error))
+ return()
+  
+}
 
 save(xgbfit, file="../output/xgbfit_sift5000.RData")
 save(svmfit, file="../output/svmfit_sift5000.RData")

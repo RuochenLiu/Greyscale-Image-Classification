@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ---
 title: "Untitled"
 author: "Ruochen Liu rl2841"
@@ -42,7 +41,9 @@ dat
 #}
 #return(dat)
 
-=======
+  
+```
+
 ---
 title: "Untitled"
 author: "Ruochen Liu rl2841"
@@ -81,5 +82,5 @@ if(export){
 }
 return(H)
 
->>>>>>> origin/master
+
 ```
