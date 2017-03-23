@@ -6,6 +6,7 @@ library("randomForest")
 library("plyr")
 library("xgboost")
 library("fastAdaboost")
+library("e1071")
 
 X <- read.csv("../data/sift_features.csv")
 X <- t(X)
@@ -13,8 +14,8 @@ X <- t(X)
 labels <- read.csv("../data/labels.csv")
 labels <- labels[,1]
 #dat_train<-X
-#dat_train<-dat
-dat_train<-cbind(X,dat)
+dat_train<-dat
+#dat_train<-cbind(X,dat)
 label_train <- labels
 
 
@@ -24,6 +25,8 @@ label_train <- labels
   
   r <- sample(1:n, n)
   
+  #r<-sample(1:n,n*0.8)
+    
   dat_train <- dat_train[r,]
   
   label_train <- label_train[r]
@@ -42,7 +45,7 @@ label_train <- labels
   
   testing <- data.all[-inTrain, ]
   
-  # GBM
+  ##### GBM ######
   gbmGrid <- expand.grid(interaction.depth = (1:5) * 2,n.trees = (1:10)*25,shrinkage = .1,
                          n.minobsinnode = 10)
   
@@ -51,33 +54,71 @@ label_train <- labels
                   bag.fraction = 0.5, tuneGrid = gbmGrid
   ) #parameter tuning
   
-  err.gbm <- sum(predict(gbmfit, testing) != testing$Label)/nrow(testing)
+  #Train error
+  train.err.gbm <- sum(predict(rf.tuned, training) != training$Label)/nrow(training)
+  train.err.gbm
   
-  # Random Forest
+  #Test error
+  test.err.gbm <- sum(predict(rf.test, testing) != testing$Label)/nrow(testing)
+  test.err.gbm
+  
+  
+  ###### Random Forest ######
   rfGrid <- expand.grid(mtry = 2^(5:10) )
   
   rffit <- train(Label~., data = training,
-                 method = "rf", trControl = control, tuneGrid = rfGrid
-  ) #parameter tuning
-  
-  err.rf <- sum(predict(rffit, testing) != testing$Label)/nrow(testing)
+                 method = "rf", trControl = control, tuneGrid = rfGrid) #parameter tuning
   
   
-  # SVM Linear Kernel
+  rf.tuned<-randomForest(Label~., data=training, mtry=rffit$bestTune$mtry)
+  rf.test<-randomForest(Label~., data=testing,mtry=rffit$bestTune$mtry)
+  
+  #Train error
+  train.err.rf <- sum(predict(rf.tuned, training) != training$Label)/nrow(training)
+  train.err.rf
+  
+  #Test error
+  test.err.rf <- sum(predict(rf.test, testing) != testing$Label)/nrow(testing)
+  test.err.rf
+  
+  
+  ###### SVM Linear Kernel ######
   svmGrid.linear <- expand.grid(C= 2^c(0:5))
   svmfit.linear <- train(Label~., data = training,
                          method = "svmLinear", trControl = control, tuneGrid = svmGrid.linear, preProc = c("center","scale")
   ) #parameter tuning
   
-  err.svm.linear <- sum(predict(svmfit.linear, testing) != testing$Label)/nrow(testing)
+  svm.linear.tuned<-svm(Label~., data=training, kernel="linear",cost=svmfit.linear$bestTune$C)
+  svm.linear.test<-svm(Label~., data=testing, kernel="linear",cost=svmfit.linear$bestTune$C)
   
-  # SVM RBF
+  #Train error
+  train.err.svm.l <- sum(predict(svm.linear.tuned, training) != training$Label)/nrow(training)
+  train.err.svm.l
+  
+  #Test error
+  test.err.svm.l <- sum(predict(svm.linear.test, testing) != testing$Label)/nrow(testing)
+  test.err.svm.l
+  
+  
+  
+  ###### SVM RBF Kernel ######
   svmGrid <- expand.grid(sigma= 2^c(-25, -20, -15,-10, -5, 0), C= 2^c(0:5))
   svmfit <- train(Label~., data = training,
                   method = "svmRadial", trControl = control, tuneGrid = svmGrid, preProc = c("center","scale")
   ) #parameter tuning
   
-  err.svm <- sum(predict(svmfit, testing) != testing$Label)/nrow(testing)
+  svm.tuned<-svm(Label~., data=training, kernel="radial",gamma=svmfit$bestTune$sigma,cost=svmfit$bestTune$C)
+  svm.test<-svm(Label~., data=testing, kernel="radial",gamma=svmfit$bestTune$sigma,cost=svmfit$bestTune$C)
+  
+  #Train error
+  train.err.svm <- sum(predict(svm.tuned, training) != training$Label)/nrow(training)
+  train.err.svm
+  #Test error
+  test.err.svm <- sum(predict(svm.test, testing) != testing$Label)/nrow(testing)
+  test.err.svm
+  
+  
+ 
   
   # xgBoost
   xgbfit <- train(Label~., data = training[1:100,],

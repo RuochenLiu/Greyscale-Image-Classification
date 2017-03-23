@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
+setwd("/Users/xuehan/Desktop/spr2017-proj3-group7/")
 img_dir <- "../data/raw_images/"
 dir_names <- list.files(img_dir)
 
@@ -33,10 +34,11 @@ for(i in 1:n_files){
   h <- HOG(img)
   dat[i,] <- h
 }
+dat
 ### output constructed features
-if(export){
-  save(dat, file=paste0("../output/HOG.RData"))
-}
-return(dat)
+#if(export){
+#  save(dat, file=paste0("../output/HOG.RData"))
+#}
+#return(dat)
 
 ```
