@@ -69,6 +69,13 @@ label_train <- labels
   
 
   ##### GBM ######
+  gbmGrid <- expand.grid(interaction.depth = (1:5) * 2,n.trees = (1:10)*25,shrinkage = .1,
+                         n.minobsinnode = 10)
+  
+  gbmfit <- train(Label~., data = training,
+                  method = "gbm", trControl = control, verbose = FALSE,
+                  bag.fraction = 0.5, tuneGrid = gbmGrid) #parameter tuning
+  
  gbm.tuned<-gbm(Label~., data=training, interaction.depth = gbmfit$bestTune$interaction.depth,
                 n.trees = gbmfit$bestTune$n.trees, shrinkage = gbmfit$bestTune$shrinkage,
                 n.minobsinnode = gbmfit$bestTune$n.minobsinnode,distribution = "bernoulli" )
@@ -79,11 +86,11 @@ label_train <- labels
                n.minobsinnode = gbmfit$bestTune$n.minobsinnode, distribution = "bernoulli")
   
   #Train error
-  train.err.gbm <- sum(predict(gbm.tuned, training) != training$Label)/nrow(training)
+  train.err.gbm <- sum(predict(gbm.tuned, training,n.trees=gbmfit$bestTune$n.trees) != training$Label)/nrow(training)
   train.err.gbm
   
   #Test error
-  test.err.gbm <- sum(predict(gbm.test, testing) != testing$Label)/nrow(testing)
+  test.err.gbm <- sum(predict(gbm.test, testing,n.trees=gbmfit$bestTune$n.trees) != testing$Label)/nrow(testing)
   test.err.gbm
   
   
@@ -197,16 +204,30 @@ label_train <- labels
   test.err.db
  
   
-  #Summarize training and test error for all models
-  training.error<-list(train.err.gbm,train.err.rf,train.err.svm.l, train.err.svm,
+  #Summarize training and test errors for all models
+  training.error.c<-c(train.err.gbm,train.err.rf,train.err.svm.l, train.err.svm,
                    train.err.xgboost,train.err.db) 
-  test.error<-list(test.err.gbm,test.err.rf,test.err.svm.l, test.err.svm,
+  names(training.error.c)<-c("GBM","Random Forest","SVM with Linear Kernel",
+                           "SVM with RBF","xgBoost","DeepBoost")
+  training.error<-list(training.error.c)
+  names(training.error)<-"Training Errors"
+
+  
+  
+  test.error.c<-c(test.err.gbm,test.err.rf,test.err.svm.l, test.err.svm,
                        test.err.xgboost,test.err.db)
+  names(test.error.c)<-c("GBM","Random Forest","SVM with Linear Kernel",
+                           "SVM with RBF","xgBoost","DeepBoost")
+  test.error<-list(test.error.c)
+  names(test.error)<-"Test Errors"
+  
+  
   training.err.plot<-plot(unlist(training.error))
   test.err.plot<-plot(unlist(test.error))
- return()
+
+   return(c(training.error,test.error))
   
-}
+#}
 
 save(xgbfit, file="../output/xgbfit_sift5000.RData")
 save(svmfit, file="../output/svmfit_sift5000.RData")
