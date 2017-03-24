@@ -5,6 +5,7 @@ date: "March 24, 2017"
 output:
   pdf_document: default
   html_document: default
+  word_document: default
 ---
 
 Group Member:
@@ -99,7 +100,6 @@ tm_feature_test <- system.time(feature_hog <-feature(img_test_dir,export=T))
 
 Only feed the baseline training model with SIFT data. 
 ```{r}
-source("../output/baseline.RData")
 tm_test_bs <- system.time(pred_test_bs <- test(baseline, feature_sift))
 save(pred_test_bs, file="../output/pred_test_bs.RData")
 ```
@@ -108,7 +108,6 @@ save(pred_test_bs, file="../output/pred_test_bs.RData")
 
 Only feed the advanced training model with HOG data.
 ```{r}
-source("../lib/test.R")
 tm_test_ad <- system.time(pred_test_ad <- test(advanced, feature_hog))
 save(pred_test_ad, file="../output/pred_test_ad.RData")
 ``` 
@@ -127,6 +126,6 @@ cat("Time for making prediction=", tm_test_ad[1], "s \n")
 #labels <- read.csv("../data/labels.csv")
 #labels <- labels[,1]
 #x <- "The feature you choose"
-#models <- Train(X, labels) # Return the models and errors.
+#models <- Train(x, labels) # Return the models and errors.
 ```
 
