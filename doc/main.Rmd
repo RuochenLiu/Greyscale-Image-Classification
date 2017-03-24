@@ -14,7 +14,7 @@ Nikita Bondarenko, Yue Gao, Ruochen Liu, Xuehan Liu, Xiaowo Sun
 Instructions: When testing new data, put new images in test folder and put sift_features_test.csv in data.
 
 ### Step 0: load libraries and specify directories
-```{r}
+```{r, warning=FALSE}
 #install.packages("caret")
 #install.packages("gbm")
 #install.packages("randomForest")
