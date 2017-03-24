@@ -60,7 +60,6 @@ Random Forest:0.142
 SVM Linear: 0.122
 SVM Radial: 0.118
 xgBoost: 0.136
-DeepBoost: 0.15
 
 ####advanced model
 
