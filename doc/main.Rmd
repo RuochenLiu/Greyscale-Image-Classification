@@ -14,6 +14,19 @@ Instructions: When testing new data, put new images in test folder and put sift_
 
 ### Step 0: load libraries and specify directories
 ```{r}
+install.packages("caret")
+library("gbm")
+library("randomForest")
+library("plyr")
+library("xgboost")
+library("fastAdaboost")
+library("deepboost")
+library("EBImage")
+library("e1071")
+library("kernlab")
+library("OpenImageR")
+
+
 library("caret")
 library("gbm")
 library("randomForest")
