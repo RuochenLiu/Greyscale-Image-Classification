@@ -52,7 +52,7 @@ Provide directories for raw images. Training set and test set should be in diffe
 ```{r}
 experiment_dir <- "../data/" # This will be modified for different data sets.
 img_train_dir <- paste(experiment_dir, "raw_images/", sep="")
-img_test_dir <- paste(experiment_dir, "raw_images/", sep="")
+img_test_dir <- paste(experiment_dir, "test/", sep="")
 ```
 
 ###Step 1: Summary of trained models
@@ -88,7 +88,7 @@ print(advanced$finalModel)
 
 For our project, we construct 54 HOG features. Save the constructed features to the output subfolder.
 ```{r}
-feature_sift <- read.csv("../data/sift_features.csv")
+feature_sift <- read.csv("../data/sift_features_test.csv")
 feature_sift <- t(feature_sift)
 tm_feature_test <- system.time(feature_hog <-feature(img_test_dir,export=T))
 #load("../output/HOG.RData")
@@ -102,6 +102,7 @@ Only feed the baseline training model with SIFT data.
 ```{r}
 tm_test_bs <- system.time(pred_test_bs <- test(baseline, feature_sift))
 save(pred_test_bs, file="../output/pred_test_bs.RData")
+write.csv(pred_test_bs, file="../output/pred_test_bs.csv")
 ```
 
 ####advanced model
@@ -110,6 +111,7 @@ Only feed the advanced training model with HOG data.
 ```{r}
 tm_test_ad <- system.time(pred_test_ad <- test(advanced, feature_hog))
 save(pred_test_ad, file="../output/pred_test_ad.RData")
+write.csv(pred_test_ad, file="../output/pred_test_ad.csv")
 ``` 
 
 ### Step 4: Summarize Running Time
