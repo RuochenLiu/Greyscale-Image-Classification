@@ -14,18 +14,17 @@ Instructions: When testing new data, put new images in test folder and put sift_
 
 ### Step 0: load libraries and specify directories
 ```{r}
-install.packages("caret")
-library("gbm")
-library("randomForest")
-library("plyr")
-library("xgboost")
-library("fastAdaboost")
-library("deepboost")
-library("EBImage")
-library("e1071")
-library("kernlab")
-library("OpenImageR")
-
+#install.packages("caret")
+#install.packages("gbm")
+#install.packages("randomForest")
+#install.packages("plyr")
+#install.packages("xgboost")
+#install.packages("fastAdaboost")
+#install.packages("deepboost")
+#install.packages("EBImage")
+#install.packages("e1071")
+#install.packages("kernlab")
+#install.packages("OpenImageR")
 
 library("caret")
 library("gbm")
@@ -42,11 +41,10 @@ library("OpenImageR")
 
 
 ```{r wkdir, eval=FALSE}
-setwd("~/GitHub/spr2017-proj3-group7/doc/") 
+setwd("~/GitHub/spr2017-proj3-group7/doc/") # Here replace it with your own path or manually set it in RStudio to where this rmd file is located.
 source("../lib/feature.R")
 source("../lib/train.R")
 source("../lib/test.R")
-# here replace it with your own path or manually set it in RStudio to where this rmd file is located. 
 ```
 
 Provide directories for raw images. Training set and test set should be in different subfolders. 
@@ -89,16 +87,10 @@ print(advanced$finalModel)
 
 For our project, we construct 54 HOG features. Save the constructed features to the output subfolder.
 ```{r}
-<<<<<<< HEAD
-source("../lib/feature.R")
-tm_feature_test <- system.time(feature_test <-feature(img_test_dir,export=T))
-=======
 feature_sift <- read.csv("../data/sift_features.csv")
 feature_sift <- t(feature_sift)
 tm_feature_test <- system.time(feature_hog <-feature(img_test_dir,export=T))
->>>>>>> origin/master
 #load("../output/HOG.RData")
-
 ```
 
 ### Step 3: Make prediction 
@@ -107,31 +99,19 @@ tm_feature_test <- system.time(feature_hog <-feature(img_test_dir,export=T))
 
 Only feed the baseline training model with SIFT data. 
 ```{r}
-<<<<<<< HEAD
-source("../lib/test.R")
 source("../output/baseline.RData")
-tm_test <- system.time(pred_test <- test(baseline, feature_test))
-save(pred_test, file="./output/pred_test.RData")
-=======
-tm_test_bs <- system.time(pred_test_bs <- Test(baseline, feature_sift))
+tm_test_bs <- system.time(pred_test_bs <- test(baseline, feature_sift))
 save(pred_test_bs, file="../output/pred_test_bs.RData")
->>>>>>> origin/master
 ```
 
 ####advanced model
 
 Only feed the advanced training model with HOG data.
 ```{r}
-<<<<<<< HEAD
 source("../lib/test.R")
-tm_test <- system.time(pred_test <- test(advanced, feature_test))
-save(pred_test, file="./output/pred_test.RData")
-```
-=======
-tm_test_ad <- system.time(pred_test_ad <- Test(advanced, feature_hog))
+tm_test_ad <- system.time(pred_test_ad <- test(advanced, feature_hog))
 save(pred_test_ad, file="../output/pred_test_ad.RData")
 ``` 
->>>>>>> origin/master
 
 ### Step 4: Summarize Running Time
 
