@@ -1,7 +1,7 @@
 ###########################################################################
 ####### This file (Train.R) is consistent of six training models.   #######
 ####### They are GBM, SVM with Linear Kernel, SVM with RBF Kernel,  #######
-####### Random Forest, xgboost, and DeepBoost.                      #######
+####### Random Forest, and xgboost.                                 #######
 
 ###########################################################################
 
@@ -12,7 +12,7 @@
 
 ###########################################################################
 
-###### Overall, our best model is feature HOG + classifier DeepBoost.######
+## Overall, our best model is feature HOG + SVM with Linear Kernel.  ######
 
 ###########################################################################
 
@@ -105,24 +105,9 @@ Train <- function(dat_train, label_train){
   
   test.xgb <- sum(predict(xgbfit, testing) != testing$Label)/nrow(testing)
   
-  
-  
-  
-  ###### DeepBoost ######
-  #dbfit <- train(Label~., data = training,
-  #               method = "deepboost", trControl = control, verbose = FALSE)
-  #
-  #train.db <- sum(predict(dbfit, training) != training$Label)/nrow(training)
-  #
-  #test.db <- sum(predict(dbfit, testing) != testing$Label)/nrow(testing)
- 
-  
-  
-  
+
   #Summarize training and test errors for all models
 
-  #training.err.plot<-plot(unlist(training.error))
-  #test.err.plot<-plot(unlist(test.error))
   
   models <- list(GBM = gbmfit, RF = rffit, SVML = svm.linear, SVM = svmfit, XGB = xgbfit)
   
