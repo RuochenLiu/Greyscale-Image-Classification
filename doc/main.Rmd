@@ -76,8 +76,9 @@ print(advanced$finalModel)
 
 For our project, we construct 54 HOG features. Save the constructed features to the output subfolder.
 ```{r}
-
-tm_feature_test <- system.time(feature_test <-feature(img_test_dir,export=T))
+feature_sift <- read.csv("../data/sift_features.csv")
+feature_sift <- t(feature_sift)
+tm_feature_test <- system.time(feature_hog <-feature(img_test_dir,export=T))
 #load("../output/HOG.RData")
 
 ```
@@ -88,7 +89,7 @@ tm_feature_test <- system.time(feature_test <-feature(img_test_dir,export=T))
 
 Only feed the baseline training model with SIFT data. 
 ```{r}
-tm_test_bs <- system.time(pred_test_bs <- Test(baseline, feature_test))
+tm_test_bs <- system.time(pred_test_bs <- Test(baseline, feature_sift))
 save(pred_test_bs, file="../output/pred_test_bs.RData")
 ```
 
@@ -96,7 +97,7 @@ save(pred_test_bs, file="../output/pred_test_bs.RData")
 
 Only feed the advanced training model with HOG data.
 ```{r}
-tm_test_ad <- system.time(pred_test_ad <- Test(advanced, feature_test))
+tm_test_ad <- system.time(pred_test_ad <- Test(advanced, feature_hog))
 save(pred_test_ad, file="../output/pred_test_ad.RData")
 ``` 
 
