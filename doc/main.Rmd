@@ -78,7 +78,7 @@ For our project, we construct 54 HOG features. Save the constructed features to 
 ```{r}
 
 tm_feature_test <- system.time(feature_test <-feature(img_test_dir,export=T))
-#load("./output/HOG.RData")
+#load("../output/HOG.RData")
 
 ```
 
@@ -89,13 +89,13 @@ tm_feature_test <- system.time(feature_test <-feature(img_test_dir,export=T))
 Feed the baseline training model with the completely holdout testing data. 
 ```{r}
 tm_test <- system.time(pred_test <- test(baseline, feature_test))
-save(pred_test, file="./output/pred_test.RData")
+save(pred_test, file="../output/pred_test.RData")
 ```
 
 ####advanced model
 ```{r}
 tm_test <- system.time(pred_test <- test(advanced, feature_test))
-save(pred_test, file="./output/pred_test.RData")
+save(pred_test, file="../output/pred_test.RData")
 ```
 
 ### Step 4: Summarize Running Time
