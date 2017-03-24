@@ -86,22 +86,24 @@ tm_feature_test <- system.time(feature_test <-feature(img_test_dir,export=T))
 
 ####baseline model
 
-Feed the baseline training model with the completely holdout testing data. 
+Feed the baseline training model with SIFT data. 
 ```{r}
-tm_test_bs <- system.time(pred_test <- test(baseline, feature_test))
-save(pred_test, file="../output/pred_test_bs.RData")
+tm_test_bs <- system.time(pred_test.bs <- Test(baseline, feature_test))
+save(pred_test.bs, file="../output/pred_test_bs.RData")
 ```
 
 ####advanced model
+
+Feed the advanced training model with HOG data.
 ```{r}
-tm_test_ad <- system.time(pred_test <- test(advanced, feature_test))
-save(pred_test, file="../output/pred_test_ad.RData")
-```
+tm_test_ad <- system.time(pred_test.ad <- Test(advanced, feature_test))
+save(pred_test.ad, file="../output/pred_test_ad.RData")
+``` 
 
 ### Step 4: Summarize Running Time
 
 ```{r}
 cat("Time for constructing testing features=", tm_feature_test[1], "s \n")
-cat("Time for making prediction=", tm_test[1], "s \n")
+cat("Time for making prediction=", tm_test_ad[1], "s \n")
 ```
 
