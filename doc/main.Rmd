@@ -41,6 +41,9 @@ library("deepboost")
 library("EBImage")
 library("e1071")
 library("kernlab")
+source("./lib/feature.R")
+source("./lib/train.R")
+source("./lib/test.R")
 ```
 
 
@@ -81,15 +84,16 @@ DeepBoost: 0.15
 Finally we decided to use SVM Linear model because of its low test error and stability.
 ```{r}
 #load SVM here
-load("../")
-
+load("../output/advanced.RData")
+print(advanced$bestTune)
+print(mean(advanced$finalModel$train.error))
 ```
 
 ### Step 2: Extract new features from test images
 
 For our project, we construct 54 HOG features. Save the constructed features to the output subfolder.
 ```{r}
-source("./lib/feature.R")
+
 tm_feature_test <- system.time(feature_test <-feature(img_test_dir,export=T))
 #load("./output/HOG.RData")
 
