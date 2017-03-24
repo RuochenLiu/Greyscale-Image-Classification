@@ -35,7 +35,7 @@ Train <- function(dat_train, label_train){
   
   data.all$Label <- as.factor(data.all$Label)
   
-  control <- trainControl(method = 'cv', number = 5)  #use 5-fold cross validation
+  control <- trainControl(method = 'cv', number = 10)  #use 5-fold cross validation
   
   inTrain <- createDataPartition(y = data.all$Label, p=0.75, list=FALSE)
   
@@ -45,7 +45,7 @@ Train <- function(dat_train, label_train){
   
 
   ##### GBM ######
-  gbmGrid <- expand.grid(interaction.depth = (1:5) * 2,n.trees = (1:10)*25,shrinkage = .1,
+  gbmGrid <- expand.grid(interaction.depth = (1:10),n.trees = (1:10),shrinkage = .1,
                          n.minobsinnode = 10)
   
   gbmfit <- train(Label~., data = training,
@@ -57,7 +57,7 @@ Train <- function(dat_train, label_train){
   test.gbm <- sum(predict(gbmfit, testing) != testing$Label)/nrow(testing)
   
   ###### Random Forest ######
-  rfGrid <- expand.grid(mtry = 2^(1:5) )
+  rfGrid <- expand.grid(mtry = 1:5)
   
   rffit <- train(Label~., data = training,
                  method = "rf", trControl = control, tuneGrid = rfGrid) #parameter tuning
@@ -70,7 +70,7 @@ Train <- function(dat_train, label_train){
 
   ###### SVM with Linear Kernel ######
 
-  svmGrid.linear <- expand.grid(C= 2^c(0:5))
+  svmGrid.linear <- expand.grid(C= 2^c(0,1,2,-1,-2))
   
   svm.linear <- train(Label~., data = training,
                          method = "svmLinear", trControl = control, tuneGrid = svmGrid.linear, preProc = c("center","scale")
@@ -109,12 +109,12 @@ Train <- function(dat_train, label_train){
   
   
   ###### DeepBoost ######
-  dbfit <- train(Label~., data = training,
-                  method = "deepboost", trControl = control, verbose = FALSE)
-  
-  train.db <- sum(predict(dbfit, training) != training$Label)/nrow(training)
-  
-  test.db <- sum(predict(dbfit, testing) != testing$Label)/nrow(testing)
+  #dbfit <- train(Label~., data = training,
+  #               method = "deepboost", trControl = control, verbose = FALSE)
+  #
+  #train.db <- sum(predict(dbfit, training) != training$Label)/nrow(training)
+  #
+  #test.db <- sum(predict(dbfit, testing) != testing$Label)/nrow(testing)
  
   
   
@@ -124,15 +124,15 @@ Train <- function(dat_train, label_train){
   #training.err.plot<-plot(unlist(training.error))
   #test.err.plot<-plot(unlist(test.error))
   
-  models <- list(GBM = gbmfit, RF = rffit, SVML = svm.linear, SVM = svmfit, XGB = xgbfit, DB = dbfit)
+  models <- list(GBM = gbmfit, RF = rffit, SVML = svm.linear, SVM = svmfit, XGB = xgbfit)
   
-  train.error <- c(train.gbm, train.rf, train.svmlinear, train.svm, train.xgb, train.db)
+  train.error <- c(train.gbm, train.rf, train.svmlinear, train.svm, train.xgb)
   
-  test.error <- c(test.gbm, test.rf, test.svmlinear, test.svm, test.xgb, test.db)
+  test.error <- c(test.gbm, test.rf, test.svmlinear, test.svm, test.xgb)
   
   errors <- data.frame(Train = train.error,Test = test.error)
   
-  rownames(errors) <- c("GBM","Random Forest","Linear SVM", "SVM with RBF","xgBoost","DeepBoost")
+  rownames(errors) <- c("GBM","Random Forest","Linear SVM", "SVM with RBF","xgBoost")
 
   return(list(models = models, errors = errors))
   
