@@ -1,26 +1,10 @@
-######################################################
-### Fit the classification model with testing data ###
-######################################################
+###########################################################################
+#######          This file (test.R) contains test function          #######
+###########################################################################
 
-### Author: Yuting Ma
-### Project 3
-### ADS Spring 2016
-
-test <- function(fit_train, dat_test){
+Test <- function(classifier, dat){
   
-  ### Fit the classfication model with testing data
+  p <- predict(classifier, dat)
   
-  ### Input: 
-  ###  - the fitted classification model using training data
-  ###  -  processed features from testing images 
-  ### Output: training model specification
-  
-  ### load libraries
-  library("gbm")
-  
-  pred <- predict(fit_train$fit, newdata=dat_test, 
-                  n.trees=fit_train$iter, type="response")
-  
-  return(as.numeric(pred> 0.5))
+  return(p)
 }
-
