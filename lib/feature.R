@@ -13,10 +13,6 @@ feature <- function(img_dir, export=T){
   ### Input: a directory that contains images ready for processing
   ### Output: an .RData file contains processed features for the images
   
-  ### load libraries
-  library("EBImage")
-  library("OpenImageR")
-  
   n_files <- length(list.files(img_dir))
   dir_names <- list.files(img_dir)
   
