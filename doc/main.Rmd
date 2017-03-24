@@ -55,7 +55,7 @@ setwd("~/GitHub/spr2017-proj3-group7")
 Provide directories for raw images. Training set and test set should be in different subfolders. 
 ```{r}
 experiment_dir <- "../data/" # This will be modified for different data sets.
-img_train_dir <- paste(experiment_dir, "train/", sep="")
+img_train_dir <- paste(experiment_dir, "raw_images/", sep="")
 img_test_dir <- paste(experiment_dir, "test/", sep="")
 ```
 
