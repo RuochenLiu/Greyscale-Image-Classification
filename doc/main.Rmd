@@ -46,7 +46,7 @@ img_test_dir <- paste(experiment_dir, "raw_images/", sep="")
 
 ####baseline model
 
-GBM + 5000SIFT
+###GBM + 5000SIFT
 ```{r}
 load("../output/baseline.RData")
 print(baseline$bestTune)
@@ -88,6 +88,7 @@ tm_feature_test <- system.time(feature_test <-feature(img_test_dir,export=T))
 Feed the baseline training model with the completely holdout testing data. 
 ```{r}
 source("../lib/test.R")
+source("../output/baseline.RData")
 tm_test <- system.time(pred_test <- test(baseline, feature_test))
 save(pred_test, file="./output/pred_test.RData")
 ```
