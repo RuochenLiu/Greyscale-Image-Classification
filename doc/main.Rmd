@@ -1,25 +1,18 @@
 ---
-title: "Project 3 - Example Main Script"
-author: "Yuting Ma, Tian Zheng"
-date: "February 24, 2016"
+title: "Project 3"
+author: "Nikita Bondarenko, Yue Gao, Ruochen Liu, Xuehan Liu, Xiaowo Sun"
+date: "March 24, 2017"
 output:
   pdf_document: default
   html_document: default
 ---
-In your final repo, there should be an R markdown file that organizes **all computational steps** for evaluating your proposed image classification framework. 
 
-This file is currently a template for running evaluation experiments of image analysis (or any predictive modeling). You should update it according to your codes but following precisely the same structure. 
+Group Member:
+Nikita Bondarenko, Yue Gao, Ruochen Liu, Xuehan Liu, Xiaowo Sun
+
+
 
 ```{r}
-if(!require("EBImage")){
-  source("https://bioconductor.org/biocLite.R")
-  biocLite("EBImage")
-}
-
-if(!require("gbm")){
-  install.packages("gbm")
-}
-
 library("EBImage")
 library("gbm")
 ```
