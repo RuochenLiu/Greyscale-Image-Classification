@@ -48,7 +48,7 @@ source("./lib/test.R")
 
 
 ```{r wkdir, eval=FALSE}
-setwd("~/GitHub/spr2017-proj3-group7") 
+setwd("~/GitHub/spr2017-proj3-group7/doc/") 
 # here replace it with your own path or manually set it in RStudio to where this rmd file is located. 
 ```
 
