@@ -41,7 +41,7 @@ library("OpenImageR")
 ```
 
 
-```{r wkdir, eval=FALSE}
+```{r}
 setwd("~/GitHub/spr2017-proj3-group7/doc/") # Here replace it with your own path or manually set it in RStudio to where this rmd file is located.
 source("../lib/feature.R")
 source("../lib/train.R")
