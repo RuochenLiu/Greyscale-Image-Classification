@@ -86,18 +86,18 @@ tm_feature_test <- system.time(feature_test <-feature(img_test_dir,export=T))
 
 ####baseline model
 
-Feed the baseline training model with SIFT data. 
+Only feed the baseline training model with SIFT data. 
 ```{r}
-tm_test_bs <- system.time(pred_test.bs <- Test(baseline, feature_test))
-save(pred_test.bs, file="../output/pred_test_bs.RData")
+tm_test_bs <- system.time(pred_test_bs <- Test(baseline, feature_test))
+save(pred_test_bs, file="../output/pred_test_bs.RData")
 ```
 
 ####advanced model
 
-Feed the advanced training model with HOG data.
+Only feed the advanced training model with HOG data.
 ```{r}
-tm_test_ad <- system.time(pred_test.ad <- Test(advanced, feature_test))
-save(pred_test.ad, file="../output/pred_test_ad.RData")
+tm_test_ad <- system.time(pred_test_ad <- Test(advanced, feature_test))
+save(pred_test_ad, file="../output/pred_test_ad.RData")
 ``` 
 
 ### Step 4: Summarize Running Time
