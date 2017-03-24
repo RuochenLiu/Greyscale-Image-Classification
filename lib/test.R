@@ -2,7 +2,7 @@
 #######          This file (test.R) contains test function          #######
 ###########################################################################
 
-Test <- function(classifier, dat){
+test <- function(classifier, dat){
   
   p <- predict(classifier, dat)
   
